@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import Livro
 
@@ -41,4 +41,24 @@ def cadastra_livro(request):
     # all() é uma função que retorna todos os registros da tabela livro. (mesma coisa que o SELECT em Banco de Dados).
     livros = Livro.objects.all()
     return render(request, 'livros.html', {'livros': livros})
+
+def exclui_livro(request, livro_id):
+    livro = get_object_or_404(Livro, id=livro_id)
+    livro.delete()
+    return redirect('cadastra_livro')
+
+def edita_livro(request, livro_id):
+    livro = get_object_or_404(Livro, id=livro_id)
+    livros = Livro.objects.all()
+
+    if request.method == 'POST':
+        livro.titulo = request.POST['titulo']
+        livro.autor = request.POST['autor']
+        livro.ano_publicacao = request.POST['ano_publicacao']
+        livro.editora = request.POST['editora']
+        livro.save()
+        return redirect('cadastra_livro')
+    
+    return render(request, 'livros.html', {'livros' : livros,'livro_editar' : livro})
+
 
